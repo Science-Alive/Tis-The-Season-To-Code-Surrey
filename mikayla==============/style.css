@@ -1,0 +1,23 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(184, 206, 123);
+    text-align: center;
+    }
+
+h1 {
+    background-color: rgb(228, 228, 228)
+    margin:15px;
+    padding: 10px
+}
+p {
+    background-color: rgb(71, 112, 148);
+}
+
+h2 {background-color:cadetblue ;
+
+}
+h2 {text-align: center;}
+
+ul {
+    text-align: left;
+}

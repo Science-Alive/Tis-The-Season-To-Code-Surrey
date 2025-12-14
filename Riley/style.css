@@ -1,0 +1,23 @@
+Body{
+    font-family: "Bangers", system-ui;
+    background-color:  rgb(255, 179, 191)
+}
+
+H1{
+    background-color: blueviolet;
+    color:aqua;
+    padding: 15px;
+    text-align:center;
+}
+
+p{
+    color:slateblue;
+    text-align:center;
+}
+
+ul {
+  list-style-image: url('https://64.media.tumblr.com/29d28f86d1844acacbaccf21ddba4636/63a29449cabf58cf-78/s500x750/cc102a3ffdf76826ee3a68a50ff5d30c43d30245.gifv');
+  list-style-type: square;
+  margin-left: 400px;
+  height: 50px;
+}

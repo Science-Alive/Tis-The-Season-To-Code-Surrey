@@ -1,0 +1,18 @@
+body{
+    font-family: arial, helvetica, sans-serif;
+    background-color: rgb(144, 176, 236);
+}
+
+a {
+    color:rgb(236, 238, 240)
+}
+p{background-color: aliceblue;}
+h2{background-color: aliceblue}
+h1{text-align: center}
+p{text-align: center}
+H2{text-align: center}
+a {text-align: center}
+h1{background-color: aliceblue;}
+li{font-size: 17pt;}
+a{font-size: 17pt}
+p{font-size: 17pt;}
