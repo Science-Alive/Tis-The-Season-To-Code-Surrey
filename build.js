@@ -1,0 +1,257 @@
+const fs = require('fs');
+const path = require('path');
+
+// --- CONFIGURATION ---
+const logoFilename = 'assets/SA_SFU_Logo.png';     
+const mascotFilename = 'assets/Wattson.svg'; 
+const pageTitle = "Tis the Season to Code Surrey Showcase";
+const mascotMessage = "Here's a showcase of everyone's website who attended Science AL!VE's Holiday Makers Lab!";
+const targetFolder = 'projects'; 
+const projectsPath = path.join(__dirname, targetFolder);
+// ---------------------
+
+if (!fs.existsSync(projectsPath)) {
+    console.error(`❌ Error: Could not find folder: "${targetFolder}". Make sure it exists in the root.`);
+    process.exit(1);
+}
+
+const folders = fs.readdirSync(projectsPath, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith('.'))
+    .map(dirent => dirent.name);
+
+const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${pageTitle}</title>
+    <style>
+        :root {
+            --primary: #33569B;
+            --secondary: #A6192E;
+            --bg-color: #f4f4f5;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg-color); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh;
+        }
+
+        header { 
+            background-color: var(--primary); 
+            color: white; 
+            padding: 2rem 1rem; 
+            text-align: center; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .company-logo {
+            max-height: 100px; 
+            width: auto;
+            object-fit: contain;
+            background: white; 
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 1rem;
+        }
+
+        #search { 
+            width: 100%; 
+            padding: 15px 20px; 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 16px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            outline: none;
+            box-sizing: border-box; 
+        }
+
+        #search:focus { box-shadow: 0 0 0 4px var(--secondary); }
+
+        .mascot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999; /* Extremely high z-index to stay on top */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            pointer-events: none; /* Let clicks pass through the empty space around items */
+        }
+
+        .mascot {
+            width: 120px;
+            height: auto;
+            cursor: pointer;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+            transition: transform 0.2s ease;
+            pointer-events: auto; /* Re-enable clicks specifically for the image */
+        }
+
+        .mascot:hover { transform: scale(1.05); }
+        .mascot:active { transform: scale(0.95); }
+
+        .speech-bubble {
+            background: white;
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 15px;
+            border-bottom-right-radius: 0; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            max-width: 250px;
+            font-size: 14px;
+            line-height: 1.4;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary);
+            pointer-events: none;
+        }
+
+        .speech-bubble.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            padding-bottom: 150px; 
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 1.5rem; 
+        }
+        
+        .card { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            transition: all 0.2s ease; 
+            text-decoration: none; 
+            color: inherit; 
+            border-left: 5px solid transparent; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--secondary); 
+        }
+
+        .card h2 { margin: 0; font-size: 1.3rem; text-transform: capitalize; color: #333; }
+        .card .btn { margin-top: 1rem; color: var(--primary); font-weight: bold; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <img src="${logoFilename}" alt="Logo" class="company-logo" onerror="this.style.display='none'">
+            <h1>${pageTitle}</h1>
+            <div class="search-wrapper">
+                <input type="text" id="search" placeholder="🔍 Search projects..." onkeyup="filterProjects()">
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="grid" id="project-grid">
+            ${folders.map(name => `
+            <a href="${targetFolder}/${name}/" class="card">
+                <h2>${name.replace(/-/g, ' ')}</h2>
+                <span class="btn">View Project &rarr;</span>
+            </a>
+            `).join('')}
+        </div>
+    </div>
+
+    <div class="mascot-container">
+        <div id="bubble" class="speech-bubble">
+            ${mascotMessage}
+        </div>
+        <!-- ADDED ID 'mascot-img' AND REMOVED ONCLICK -->
+        <img id="mascot-img" src="${mascotFilename}" alt="Mascot" class="mascot" onerror="console.error('Mascot failed to load'); this.style.display='none'">
+    </div>
+
+    <script>
+        console.log("✅ System Check: Script Loaded");
+
+        // Wait for HTML to be fully ready
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 1. Setup Mascot Click Listener
+            const mascotImg = document.getElementById('mascot-img');
+            if(mascotImg) {
+                console.log("✅ Mascot image found in DOM");
+                mascotImg.addEventListener('click', toggleMessage);
+            } else {
+                console.error("❌ Mascot image NOT found (Check IDs)");
+            }
+
+            // 2. Setup Search Filter
+            const searchInput = document.getElementById('search');
+            if(searchInput) {
+                searchInput.addEventListener('keyup', filterProjects);
+            }
+        });
+
+        function filterProjects() {
+            const input = document.getElementById('search');
+            const filter = input.value.toLowerCase();
+            const cards = document.getElementsByClassName('card');
+            for (let i = 0; i < cards.length; i++) {
+                const txtValue = cards[i].querySelector('h2').textContent || cards[i].querySelector('h2').innerText;
+                cards[i].classList.toggle('hidden', txtValue.toLowerCase().indexOf(filter) === -1);
+            }
+        }
+
+        function toggleMessage() {
+            const bubble = document.getElementById('bubble');
+            bubble.classList.toggle('visible');
+            
+            if (bubble.classList.contains('visible')) {
+                setTimeout(() => { bubble.classList.remove('visible'); }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(path.join(__dirname, 'index.html'), htmlContent);
+console.log(`✅ Lobby generated! Found ${folders.length} projects in /${targetFolder}`);
